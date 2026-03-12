@@ -44,6 +44,18 @@ export function setupFetchInterceptors() {
         headers.set("Authorization", `Bearer ${token}`)
       }
 
+      // IMPORTANT: For FormData uploads, do NOT reconstruct the request body.
+      // Rebuilding Request/init may cause multipart boundary/body loss and make server miss parts.
+      const isFormDataBody = typeof FormData !== "undefined" && init?.body instanceof FormData
+      if (isFormDataBody) {
+        const passthroughInit: RequestInit = {
+          ...init,
+          headers,
+        }
+        const res = await originalFetch(url, passthroughInit)
+        return res
+      }
+
       const newInit: RequestInit = {
         ...init,
         headers,

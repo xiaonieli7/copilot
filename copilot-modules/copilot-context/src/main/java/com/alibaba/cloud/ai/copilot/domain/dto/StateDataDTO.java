@@ -19,6 +19,7 @@ import java.util.Map;
  * 用于接收output.state().data()的数据结构
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StateDataDTO {
 
     @JsonProperty("input")

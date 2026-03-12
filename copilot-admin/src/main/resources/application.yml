@@ -36,9 +36,9 @@ spring:
         master:
           type: ${spring.datasource.type}
           driverClassName: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://127.0.0.1:3306/spring_ai_copilot?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://127.0.0.1:3603/spring_ai_copilot?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
           username: root
-          password: 123456
+          password: root
 
       # HikariCP 连接池配置
       hikari:
@@ -82,11 +82,11 @@ spring.data:
     # 地址
     host: 127.0.0.1
     # 端口，默认为6379
-    port: 6379
+    port: 6381
     # 数据库索引
-    database: 0
+    database: 1
     # 密码(如没有密码请注释掉)
-#    password:
+    password:
     # 连接超时时间
     timeout: 10S
 
@@ -290,6 +290,23 @@ app:
       connection-timeout: 10
       # 最大重试次数
       max-retries: 3
+
+  # Skills 配置
+  skill:
+    # 是否启用技能功能
+    enabled: true
+    # 用户级技能目录
+    user-skills-directory: ${user.home}/.copilot/skills
+    # 项目级技能目录
+    project-skills-directory: ./skills
+    # 是否启用技能市场
+    market-enabled: false
+    # 技能市场 API 地址
+    market-api-url:
+    # 延迟加载 (false 则启动时加载)
+    lazy-load: false
+
+
 
 
 

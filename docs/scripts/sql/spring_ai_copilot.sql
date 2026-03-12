@@ -18,6 +18,43 @@ SET NAMES utf8mb4;
 SET
 FOREIGN_KEY_CHECKS = 0;
 
+
+-- =====================================================
+-- 技能市场表
+-- 存储技能市场中的技能信息
+-- =====================================================
+CREATE TABLE IF NOT EXISTS `skill_market` (
+                                              `id` BIGINT NOT NULL COMMENT '主键ID',
+                                              `skill_name` VARCHAR(100) NOT NULL COMMENT '技能名称',
+    `display_name` VARCHAR(200) DEFAULT NULL COMMENT '显示名称',
+    `description` TEXT COMMENT '技能描述',
+    `category` VARCHAR(50) DEFAULT NULL COMMENT '分类',
+    `version` VARCHAR(20) DEFAULT NULL COMMENT '版本',
+    `author` VARCHAR(100) DEFAULT NULL COMMENT '作者',
+    `download_url` VARCHAR(500) DEFAULT NULL COMMENT '下载地址',
+    `star_count` INT DEFAULT 0 COMMENT '点赞数',
+    `download_count` INT DEFAULT 0 COMMENT '下载次数',
+    `is_official` TINYINT(1) DEFAULT 0 COMMENT '是否官方技能',
+    `status` VARCHAR(20) DEFAULT 'active' COMMENT '状态: active/inactive/deprecated',
+    `created_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_skill_name` (`skill_name`),
+    KEY `idx_category` (`category`),
+    KEY `idx_status` (`status`),
+    KEY `idx_is_official` (`is_official`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='技能市场表';
+
+-- =====================================================
+-- 插入一些示例数据 (可选)
+-- =====================================================
+INSERT INTO `skill_metadata` (`id`, `skill_name`, `display_name`, `description`, `scope`, `enabled`, `category`, `version`, `author`, `file_path`) VALUES
+(1, 'code-commit-helper', '代码提交助手', '生成规范的 Git Commit 消息、添加代码注释、生成 PR 描述', 'project', 1, '代码工具', '1.0.0', 'Alibaba Cloud AI Team', './skills/code-commit-helper/SKILL.md'),
+(2, 'clean-chinese-writing', '专业中文写作', '帮助撰写专业、简洁的中文内容，避免 AI 味', 'project', 1, '文档工具', '1.0.0', 'Alibaba Cloud AI Team', './skills/clean-chinese-writing/SKILL.md'),
+(3, 'weekly-report', '周报生成器', '自动生成结构化的工作周报', 'project', 1, '文档工具', '1.0.0', 'Alibaba Cloud AI Team', './skills/weekly-report/SKILL.md'),
+(4, 'pdf-extractor', 'PDF 提取器', '从 PDF 文件中提取文本、表格和图片', 'project', 1, '文档处理', '1.0.0', 'Alibaba Cloud AI Team', './skills/pdf-extractor/SKILL.md')
+ON DUPLICATE KEY UPDATE updated_time = CURRENT_TIMESTAMP;
+
     -- ----------------------------
 -- Table structure for chat_memory_store
 -- ----------------------------

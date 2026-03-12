@@ -11,8 +11,9 @@ import KnowledgeSettings from "@/components/Settings/KnowledgeSettings";
 import ModelSettings from "@/components/Settings/ModelSettings";
 import PromptSettings from "@/components/Settings/PromptSettings";
 import MemorySettings from "@/components/Settings/MemorySettings";
+import SkillSettings from "@/components/Settings/SkillSettings";
 
-export type SettingsTab = "General" | "Quota" | "MCPServer" | "Knowledge" | "Models" | "Prompts" | "Memory";
+export type SettingsTab = "General" | "Quota" | "MCPServer" | "Knowledge" | "Models" | "Prompts" | "Memory" | "Skills";
 
 const isElectron = typeof window !== "undefined" && !!window.electron;
 export const TAB_KEYS = {
@@ -23,6 +24,7 @@ export const TAB_KEYS = {
   Models: "Models" as const,
   Prompts: "Prompts" as const,
   Memory: "Memory" as const,
+  Skills: "Skills" as const,
 } as const;
 
 interface SettingsProps {
@@ -212,6 +214,27 @@ export function Settings({
     ),
   });
 
+  tabs.push({
+    id: TAB_KEYS.Skills,
+    label: "技能管理",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M14.7 6.3a1 1 0 011.4 0l1.6 1.6a1 1 0 010 1.4l-8.4 8.4-3 0.4 0.4-3 8.4-8.4z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 20h9"
+        />
+      </svg>
+    ),
+  });
+
   return createPortal(
     <div
       className={`
@@ -273,6 +296,7 @@ export function Settings({
           {activeTab === TAB_KEYS.Models && <ModelSettings />}
           {activeTab === TAB_KEYS.Prompts && <PromptSettings />}
           {activeTab === TAB_KEYS.Memory && <MemorySettings />}
+          {activeTab === TAB_KEYS.Skills && <SkillSettings />}
         </div>
 
         {/* Close Button */}

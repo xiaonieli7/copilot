@@ -10,6 +10,7 @@ import com.alibaba.cloud.ai.copilot.hook.ConversationHistoryHook;
 import com.alibaba.cloud.ai.copilot.hook.ConversationSaveHook;
 import com.alibaba.cloud.ai.copilot.hook.LongTermMemoryHook;
 import com.alibaba.cloud.ai.copilot.interceptor.DynamicSystemPromptInterceptor;
+import com.alibaba.cloud.ai.graph.agent.hook.skills.SkillsAgentHook;
 import com.alibaba.cloud.ai.copilot.store.DatabaseStore;
 import com.alibaba.cloud.ai.copilot.mapper.ChatMessageMapper;
 import com.alibaba.cloud.ai.copilot.mapper.McpToolInfoMapper;
@@ -36,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -71,6 +73,10 @@ public class ChatServiceImpl implements ChatService {
     private final McpToolInfoMapper mcpToolInfoMapper;
     private final DatabaseStore databaseStore;
     private final LongTermMemoryHook longTermMemoryHook;
+
+    // Skills Hook (可选注入)
+    @Autowired(required = false)
+    private SkillsAgentHook skillsAgentHook;
 
     @Override
     public void handleBuilderMode(ChatRequest request, String userId, SseEmitter emitter) {
@@ -123,6 +129,12 @@ public class ChatServiceImpl implements ChatService {
             // 4.4 长期记忆 Hook（加载用户画像和学习偏好）
             if (appProperties.getMemory().isEnabled()) {
                 hooks.add(longTermMemoryHook);
+            }
+
+            // 4.5 Skills Hook（加载技能包）
+            if (skillsAgentHook != null) {
+                hooks.add(skillsAgentHook);
+                log.debug("Skills Hook 已启用");
             }
 
             // 5. 构建 Interceptors
