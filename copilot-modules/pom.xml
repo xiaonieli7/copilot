@@ -20,6 +20,7 @@
         <module>copilot-context</module>
         <module>copilot-system</module>
         <module>copilot-skill</module>
+        <module>copilot-knowledge</module>
     </modules>
 
 </project>

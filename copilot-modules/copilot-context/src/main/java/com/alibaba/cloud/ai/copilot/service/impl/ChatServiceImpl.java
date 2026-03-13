@@ -73,6 +73,7 @@ public class ChatServiceImpl implements ChatService {
     private final McpToolInfoMapper mcpToolInfoMapper;
     private final DatabaseStore databaseStore;
     private final LongTermMemoryHook longTermMemoryHook;
+    private final KnowledgeAvailabilityChecker knowledgeAvailabilityChecker;
 
     // Skills Hook (可选注入)
     @Autowired(required = false)
@@ -143,8 +144,12 @@ public class ChatServiceImpl implements ChatService {
             // 5.1 动态系统提示
             interceptors.add(dynamicSystemPromptInterceptor);
 
-            // 6. 加载工具
+            // 6. 加载工具（Milvus 不可用时过滤掉 search_knowledge）
             List<ToolCallback> allTools = loadToolCallback();
+            if (!knowledgeAvailabilityChecker.isAvailable()) {
+                allTools.removeIf(t -> "search_knowledge".equals(t.getToolDefinition().name()));
+                log.info("向量数据库不可用，已移除 search_knowledge 工具");
+            }
 
             log.info("共加载 {} 个工具", allTools.size());
 
@@ -163,6 +168,8 @@ public class ChatServiceImpl implements ChatService {
             // 7. 设置会话ID到上下文（供 Hook 和 Interceptor 使用）
             Long userIdLong = LoginHelper.getUserId();
             RunnableConfig.Builder configBuilder = RunnableConfig.builder()
+            // 7. 设置会话ID和用户ID到上下文（供 Hook 和 Interceptor 使用）
+            RunnableConfig config = RunnableConfig.builder()
                 .addMetadata("conversationId", conversationId)
                 .addMetadata("user_id", String.valueOf(userIdLong))
                 // 供 LongTermMemoryHook 兜底 LLM 结构化抽取时优先使用当前会话同一个模型配置
@@ -185,6 +192,8 @@ public class ChatServiceImpl implements ChatService {
             }
 
             RunnableConfig config = configBuilder.build();
+                .addMetadata("userId", userId)  // 添加 userId，供 KnowledgeContextHook 使用
+                .build();
 
             // 8. 保存用户消息到数据库
             final String finalConversationId = conversationId; // 保存为 final 变量供 lambda 使用
